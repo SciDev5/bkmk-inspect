@@ -1,10 +1,27 @@
 import { useEffect, useState } from "react";
 import { ConsoleLevelMap, ConsoleLine } from "./ConsoleLine";
-import { evalAndLog } from "./eval";
+import { evalAndLog, evalOk } from "./eval";
 import { consoleLines, onConsoleLinesChange } from "./logIntercept";
 
 function ConsoleInput() {
     const [code, setCode] = useState("");
+
+    if (!evalOk)
+        return (
+            <div style={{
+                display: "block",
+                border: "none",
+                borderTop: "1px solid #7777",
+                padding: 4,
+
+                background: "#5022",
+                color: "#502",
+                opacity: .5,
+                fontFamily: "monospace",
+            }}>
+                javascript blocked by page, command input disabled
+            </div>
+        );
     return (
         <textarea
             style={{
@@ -16,6 +33,8 @@ function ConsoleInput() {
                 
                 flex: "0 1",
                 resize: "none",
+
+                fontFamily: "monospace",
 
                 minHeight: 50,
             }}

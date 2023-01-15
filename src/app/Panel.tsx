@@ -1,4 +1,5 @@
 import React from "react"
+import { destroyApp } from "..";
 
 const HEADER_HEIGHT = 20;
 
@@ -143,7 +144,7 @@ function PanelHeader(props:{
             <button
                 style={{
                     position: "absolute",
-                    right: 0,
+                    right: 40,
                     top: 0,
                     bottom: 0,
                     width: 40,
@@ -155,6 +156,22 @@ function PanelHeader(props:{
                 }}
             >
                 {props.minimize ? "+" : "-"}
+            </button>
+            <button
+                style={{
+                    position: "absolute",
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 40,
+                    background: "#ebd5d9",
+                    border: "none",
+                }}
+                onClick={e=>{
+                    destroyApp();
+                }}
+            >
+                x
             </button>
         </div>
     )

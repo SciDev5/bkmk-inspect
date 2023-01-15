@@ -1,4 +1,4 @@
-import "./singleton";
+import {release} from "./singleton";
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -30,6 +30,12 @@ root.render(
     <App />
   </React.StrictMode>
 );
+
+export function destroyApp() {
+  root.unmount();
+  rootElt.remove();
+  release();
+}
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

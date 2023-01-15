@@ -7,4 +7,6 @@ if (moddedWindow.bkmkInstalled) {
 
 moddedWindow.bkmkInstalled = true;
 
-export {};
+export function release() {
+    moddedWindow.bkmkInstalled = false;
+}

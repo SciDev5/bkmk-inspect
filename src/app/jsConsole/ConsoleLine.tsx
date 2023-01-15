@@ -18,18 +18,21 @@ export class ConsoleLine {
     }
 
     static Element({ line }: { line: ConsoleLine; }) {
+        const color = [
+            "#777",
+            "#257",
+            "#235",
+            "#ca2",
+            "#d24",
+            "#320",
+        ][line.level ?? 5];
         return (
             <div style={{
                 fontFamily: "monospace",
-                borderBlockStart: "1px solid",
-                color: [
-                    "#777",
-                    "#257",
-                    "#235",
-                    "#fd2",
-                    "#f24",
-                    "#320",
-                ][line.level ?? 5]
+                borderBlockStart: `1px solid ${color}5`,
+                paddingInline: 5,
+                paddingBlock: 2,
+                color,
             }}>
                 {line.text}
             </div>
