@@ -1,11 +1,28 @@
+import "./singleton";
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
+import App from './app/App';
 import reportWebVitals from './reportWebVitals';
+import { css } from '@emotion/css';
+
+export const rootElt = document.createElement("div");
+rootElt.id = "bkmki-root";
+rootElt.className = css({
+  position: "fixed",
+  left: 0,
+  top: 0,
+  width: 0,
+  height: 0,
+  zIndex: 9999999,
+  "> *": {
+    boxSizing: "border-box",
+  },
+});
+document.body.append(rootElt);
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  rootElt
 );
 root.render(
   <React.StrictMode>
