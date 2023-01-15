@@ -17,9 +17,9 @@ const fs = require("fs/promises");
 
         const out = `javascript:${encodeURIComponent(js)}`;
         
-        await fs.writeFile("./build/bookmarkified.txt",out,{encoding:"utf8"});
+        await fs.writeFile("./build/bkmki-bookmarkLink.txt",out,{encoding:"utf8"});
 
-        console.log("done repacking. see /build/bookmarkified.txt");
+        console.log("done repacking. see /build/bkmki-bookmarkLink.txt");
     } catch (err) {
         console.error(err);
     }

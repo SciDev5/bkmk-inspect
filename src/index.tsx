@@ -15,6 +15,7 @@ rootElt.className = css({
   width: 0,
   height: 0,
   zIndex: 9999999,
+  color: "#000000",
   "> *": {
     boxSizing: "border-box",
   },

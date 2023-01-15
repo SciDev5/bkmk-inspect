@@ -1,6 +1,6 @@
 import React, {useState} from "react";
-import Console from "./Console";
-import DomExplorer from "./DomExplorer";
+import Console from "./jsConsole/Console";
+import DomExplorer from "./domExplorer/DomExplorer";
 import Panel from "./Panel";
 import Tabs, { TAB_HEADER_HEIGHT } from "./Tabs";
 

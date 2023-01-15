@@ -1,5 +1,5 @@
 import { ConsoleLevel, ConsoleLine } from "./ConsoleLine";
-import { TODO } from "./TODO";
+import { TODO } from "../../util/TODO";
 
 type C = Omit<typeof window.console,"Console">;
 

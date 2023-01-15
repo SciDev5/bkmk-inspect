@@ -1,6 +1,6 @@
-import { rootElt } from "..";
+import { rootElt } from "../..";
 import { css } from "@emotion/css";
-import { useEffect, useRef, useState, Fragment } from "react";
+import { useEffect, useRef, useState, Fragment, useCallback } from "react";
 
 enum NodeType {
     ELEMENT = 1,
@@ -106,7 +106,21 @@ function TextZone({text,setText,hideQuotes,tabbable}:{text?:string,setText:(txt:
     )
 }
 
-function DomEltHeader({node,level,hidden,setHidden,isOnlyChild}:{node:Node,level:number,hidden:boolean,setHidden:(h:boolean)=>void,isOnlyChild:boolean}) {
+function DomEltHeader({
+    node,
+    level,
+    hidden,
+    setHidden,
+    isOnlyChild,
+    htmlRef,
+}:{
+    node:Node,
+    level:number,
+    hidden:boolean,
+    setHidden:(h:boolean)=>void,
+    isOnlyChild:boolean,
+    htmlRef:React.Ref<HTMLDivElement>,
+}) {
     const [,setRefresher] = useState(0);
 
     useEffect(()=>{
@@ -180,11 +194,14 @@ function DomEltHeader({node,level,hidden,setHidden,isOnlyChild}:{node:Node,level
 
     return (
         <div
+            ref={htmlRef}
             onClick={e=>{
                 setHidden(!hidden);
             }}
             tabIndex={isNode.text(node) ? undefined : 0}
             onKeyDown={e=>{
+                if (document.activeElement !== e.currentTarget)
+                    return;
                 if (e.key === "Enter" || e.key === " ")
                     setHidden(!hidden);
                 if (e.key === "Backspace")
@@ -217,7 +234,19 @@ function DomEltHeader({node,level,hidden,setHidden,isOnlyChild}:{node:Node,level
     )
 }
 
-function DomEltChildren({node,level,hidden}:{node:Node,level:number,hidden?:boolean}) {
+function DomEltChildren({
+    node,
+    level,
+    hidden,
+    showingNode,
+    showParents,
+}:{
+    node:Node,
+    level:number,
+    hidden?:boolean,
+    showingNode:Node|null,
+    showParents:()=>void,
+}) {
     const [children,setChildren] = useState([...node.childNodes].filter(v=> v !== rootElt));
 
     useEffect(()=>{
@@ -241,37 +270,109 @@ function DomEltChildren({node,level,hidden}:{node:Node,level:number,hidden?:bool
             display: hidden ? "none" : "block",
         }}>
             {children.map((v,i)=>(
-                <DomEltExporer node={v} level={level+1} key={i} isOnlyChild={children.length===1}/>
+                <DomEltExporer
+                    node={v}
+                    level={level+1}
+                    key={i}
+                    isOnlyChild={children.length===1}
+                    showingNode={showingNode}
+                    showParents={showParents}
+                />
             ))}
         </div>
     );
 }
 
 const domEltExporerClassName = "dom-elt-explorer";
-function DomEltExporer({node,level,isOnlyChild}:{node:Node,level:number,isOnlyChild:boolean}) {
+function DomEltExporer({
+    node,
+    level,
+    isOnlyChild,
+    showingNode,
+    showParents,
+}:{
+    node:Node,
+    level:number,
+    isOnlyChild:boolean,
+    showingNode:Node|null,
+    showParents:()=>void,
+}) {
     const [hidden_,setHidden] = useState(
         !(
             node === document.body || node === document.body.parentNode
         )
     );
+    const focusableRef = useRef<HTMLDivElement>(null);
+
+    useEffect(()=>{
+        if (showingNode === node) {
+            setHidden(false);
+            showParents();
+            setTimeout(()=>{
+                focusableRef.current?.focus();
+                focusableRef.current?.scrollIntoView();
+            });
+        }
+    },[showingNode,node,showParents]);
 
     const hidden = hidden_ && !(node.childNodes.length === 1 && isNode.text(node.childNodes[0]))
 
     return (
         <div className={domEltExporerClassName}>
-            <DomEltHeader {...{node,level,hidden,setHidden,isOnlyChild}}/>
-            <DomEltChildren {...{node,level,hidden}}/>
+            <DomEltHeader {...{node,level,hidden,setHidden,isOnlyChild}}
+                htmlRef={focusableRef}
+            />
+            <DomEltChildren {...{node,level,hidden,showingNode}}
+                showParents={useCallback(()=>{
+                    showParents();
+                    setHidden(false);
+                },[showParents])}/>
         </div>
     )
 }
 
 export default function DomExplorer({height}:{height:number}) {
+    const [showingNode,setShowingNode] = useState<Node|null>(null);
+    const [picking,setPicking] = useState(false); 
+    
     return (
         <div style={{
-            overflow: "scroll",
             height,
         }}>
-            <DomEltChildren node={document} level={0}/>
+            <div style={{
+                height: 19,
+                display: "flex",
+            }}>
+                <button
+                    className={css({
+                        border: "none",
+                        background: picking ? "#8df" : "#eee",
+                        color: "#334",
+                        height: 20,
+                        flex: "1 1",
+                        fontFamily: "monospace",
+                        "&:hover": {
+                            background: picking ? "#8df" : "#eef",
+                        },
+                    })}
+                    onClick={()=>{
+                        setPicking(true);
+                        setTimeout(()=>{
+                            window.addEventListener("click",e=>{
+                                e.preventDefault();
+                                setPicking(false);
+                                setShowingNode(e.target as Node);
+                            },{once: true, capture:true});
+                        })
+                    }}
+                >pick elt</button>
+            </div>
+            <div style={{
+                overflow: "scroll",
+                height: height - 20,
+            }}>
+                <DomEltChildren node={document} level={0} showingNode={showingNode} showParents={()=>{}}/>
+            </div>
         </div>
     )
 }
